@@ -3,7 +3,7 @@ name: Parse.ly Daily Automation
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 16 * * *"
+    - cron: "10 6 * * *"
 
 jobs:
   run-parsely:
