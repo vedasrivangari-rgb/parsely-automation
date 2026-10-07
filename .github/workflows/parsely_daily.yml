@@ -1,0 +1,38 @@
+name: Parse.ly Daily Automation
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 16 * * *"
+
+jobs:
+  run-parsely:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install playwright openpyxl
+          playwright install --with-deps chromium
+
+      - name: Create Parse.ly auth file
+        env:
+          PARSELY_AUTH_B64: ${{ secrets.PARSELY_AUTH_B64 }}
+        run: |
+          echo "$PARSELY_AUTH_B64" | base64 --decode > parsely_auth.json
+
+      - name: Run Parse.ly automation
+        env:
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+        run: |
+          python parsely_github.py
